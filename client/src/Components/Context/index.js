@@ -1,34 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react'
 import Data from '../../Data';
 
 export const Context = React.createContext();
 
 export const Provider = (props) => {
-  const data = new Data();
+  const [courseData, setCourseData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const getCourseList = () => {
-    const courses = data.listCourses(); // from Data.js
+  useEffect(() => {
+    const data = new Data();
+    console.log(data);
 
-    if (courses !== null) {
-      // this.setState(() => {
-      //   return {
-      //     authenticatedUser: user,
-      //   }
-      // });
-
-      // // Set a login cookie
-      // Cookies.set('authenticatedUser', JSON.stringify(user), { expires: 1 });
-    }
-
-    return courses;
-  }
+    data.searchCourseApi('/courses')
+      .then(response => setCourseData(response.data))
+      .catch(error => console.log('Error fetching and parsing data', error))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   return (
     <Context.Provider value={{
-      data,
-      actions: {
-        getCourseList
-      }
+      courseData,
+      isLoading
     }}>
       { props.children}
     </Context.Provider>
