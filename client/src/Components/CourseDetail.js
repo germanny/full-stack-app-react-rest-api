@@ -1,68 +1,82 @@
 // STATEFUL This component provides the "Course Detail" screen by retrieving the detail for a course from the REST API's /api/courses/:id route and rendering the course. The component also renders a "Delete Course" button that when clicked should send a DELETE request to the REST API's /api/courses/:id route in order to delete a course. This component also renders an "Update Course" button for navigating to the "Update Course" screen.
-import React from 'react';
+import React, { useEffect } from "react";
+import { NavLink, Route } from "react-router-dom";
+import { Context } from "./Context";
+import CreateCourse from "./CreateCourse";
+import UpdateCourse from "./UpdateCourse";
 
-const CourseDetail = (props) => (
-  <div>
-    <div class="header">
-      <div class="bounds">
-        <h1 class="header--logo">Courses</h1>
-        <nav><span>Welcome Joe Smith!</span><a class="signout" href="index.html">Sign Out</a></nav>
-      </div>
-    </div>
-    <hr />
+const CourseDetail = ({ match }) => {
+  const {
+    params: { id },
+  } = match;
+
+  console.log("course detail id: ", id);
+
+  const { courseData, actions } = React.useContext(Context);
+
+  useEffect(() => {
+    actions.setCourseId(id);
+  });
+
+  const userName = !courseData.User
+    ? ""
+    : `${courseData.User.firstName} ${courseData.User.lastName}`;
+
+  return (
     <div>
-      <div class="actions--bar">
-        <div class="bounds">
-          <div class="grid-100">
+      <div className="actions--bar">
+        <div className="bounds">
+          <div className="grid-100">
             <span>
-              <a class="button" href="update-course.html">Update Course</a>
-              <a class="button" href="/">Delete Course</a>
+              <NavLink className="button" to={`/courses/${id}/update`}>
+                Update Course
+              </NavLink>
+              <a className="button" href="/">
+                Delete Course
+              </a>
             </span>
-            <a class="button button-secondary" href="index.html">Return to List</a>
+            <NavLink className="button button-secondary" to="/">
+              Return to List
+            </NavLink>
           </div>
         </div>
       </div>
 
-      <div class="bounds course--detail">
-        <div class="grid-66">
-          <div class="course--header">
-            <h4 class="course--label">Course</h4>
-            <h3 class="course--title">{props.title}</h3>
-            <p>By {props.user}</p>
+      <div className="bounds course--detail">
+        <div className="grid-66">
+          <div className="course--header">
+            Course Detail
+            <h4 className="course--label">Course</h4>
+            <h3 className="course--title">{courseData.title}</h3>
+            <p>By {userName}</p>
           </div>
-          <div class="course--description">
-            {props.description}
-          </div>
+          <div className="course--description">{courseData.description}</div>
         </div>
-        <div class="grid-25 grid-right">
-          <div class="course--stats">
-            <ul class="course--stats--list">
-              <li class="course--stats--list--item">
+        <div className="grid-25 grid-right">
+          <div className="course--stats">
+            <ul className="course--stats--list">
+              <li className="course--stats--list--item">
                 <h4>Estimated Time</h4>
-                <h3>{props.estimatedTime}</h3>
+                <h3>{courseData.estimatedTime}</h3>
               </li>
-              <li class="course--stats--list--item">
+              <li className="course--stats--list--item">
                 <h4>Materials Needed</h4>
 
                 <ul>
-                  <li>{props.materialsNeeded}</li>
-                  <li>1/2 x 3/4 inch parting strip</li>
-                  <li>1 x 2 common pine</li>
-                  <li>1 x 4 common pine</li>
-                  <li>1 x 10 common pine</li>
-                  <li>1/4 inch thick lauan plywood</li>
-                  <li>Finishing Nails</li>
-                  <li>Sandpaper</li>
-                  <li>Wood Glue</li>
-                  <li>Wood Filler</li>
-                  <li>Minwax Oil Based Polyurethane</li>
+                  <li>{courseData.materialsNeeded}</li>
                 </ul>
               </li>
             </ul>
           </div>
         </div>
       </div>
+
+      <Route
+        path={`/courses/${id}/update`}
+        render={() => <UpdateCourse id={id} />}
+      />
     </div>
-);
+  );
+};
 
 export default CourseDetail;
