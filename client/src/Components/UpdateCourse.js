@@ -1,5 +1,5 @@
 // STATEFUL This component provides the "Update Course" screen by rendering a form that allows a user to update one of their existing courses. The component also renders an "Update Course" button that when clicked sends a PUT request to the REST API's /api/courses/:id route. This component also renders a "Cancel" button that returns the user to the "Course Detail" screen.
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import FormCourse from "./FormCourse";
 import { Context } from "./Context";
 
@@ -10,30 +10,44 @@ const UpdateCourse = (props) => {
   console.log("updateCourse id: ", id);
   console.log(props);
 
-  const { courseData, actions } = React.useContext(Context);
-  const [errors, setErrors] = useState([]);
+  const { courseData, actions } = useContext(Context);
 
   useEffect(() => {
     actions.setCourseId(id);
   });
 
+  const courseDataFields = {
+    title: courseData.title || "",
+    description: courseData.description || "",
+    estimatedTime: courseData.estimatedTime || "",
+    materialsNeeded: courseData.materialsNeeded || "",
+  };
+
+  const [errors, setErrors] = useState([]);
+  const [fields, setFields] = useState(courseDataFields);
+  //const [userId, setUserId] = useState("");
+
+  console.log(fields);
+
   const userName = !courseData.User
     ? ""
     : `${courseData.User.firstName} ${courseData.User.lastName}`;
 
-  const change = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
+  const change = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
 
-    this.setState(() => {
-      return {
-        [name]: value,
-      };
+    setFields(() => {
+      return { ...fields, [name]: value };
     });
   };
 
   const submit = () => {
-    console.log("course created, sort of");
+    console.log("fields: ", fields);
+    //title
+    // description;
+    // estimatedTime;
+    // materialsNeeded;
     // const { context } = props;
     // const { from } = props.location.state || {
     //   from: { pathname: "/" },
@@ -68,7 +82,7 @@ const UpdateCourse = (props) => {
           cancel={cancel}
           errors={errors}
           submit={submit}
-          submitButtonText="Create Course"
+          submitButtonText="Update Course"
           elements={() => (
             <React.Fragment>
               <div className="grid-66">
@@ -81,7 +95,8 @@ const UpdateCourse = (props) => {
                       type="text"
                       className="input-title course--title--input"
                       placeholder="Course title..."
-                      value={courseData.title}
+                      value={fields.title || courseData.title}
+                      onChange={change}
                     />
                   </div>
                   <p>By {userName}</p>
@@ -93,9 +108,9 @@ const UpdateCourse = (props) => {
                       name="description"
                       className=""
                       placeholder="Course description..."
-                    >
-                      {courseData.description}
-                    </textarea>
+                      value={fields.description || courseData.description}
+                      onChange={change}
+                    />
                   </div>
                 </div>
               </div>
@@ -111,7 +126,10 @@ const UpdateCourse = (props) => {
                           type="text"
                           className="course--time--input"
                           placeholder="Hours"
-                          value={courseData.estimatedTime}
+                          value={
+                            fields.estimatedTime || courseData.estimatedTime
+                          }
+                          onChange={change}
                         />
                       </div>
                     </li>
@@ -123,9 +141,11 @@ const UpdateCourse = (props) => {
                           name="materialsNeeded"
                           className=""
                           placeholder="List materials..."
-                        >
-                          {courseData.materialsNeeded}
-                        </textarea>
+                          value={
+                            fields.materialsNeeded || courseData.materialsNeeded
+                          }
+                          onChange={change}
+                        />
                       </div>
                     </li>
                   </ul>
