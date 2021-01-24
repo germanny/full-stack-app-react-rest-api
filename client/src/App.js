@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import CourseDetail from "./Components/CourseDetail";
 import Courses from "./Components/Courses";
 import CreateCourse from "./Components/CreateCourse";
+import Error from "./Components/Error";
 import Header from "./Components/Header";
 import NotFound from "./Components/NotFound";
 import UpdateCourse from "./Components/UpdateCourse";
@@ -27,6 +28,7 @@ const App = () => {
             <Route path="/signin" component={UserSignIn} />
             <Route path="/signup" component={UserSignUp} />
             <Route path="/signout" component={UserSignOut} />
+            <Route path="/error" component={Error} />
             <Route component={NotFound} />
           </Switch>
         </div>

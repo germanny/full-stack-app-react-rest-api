@@ -1,35 +1,200 @@
 // STATEFUL This component provides the "Sign Up" screen by rendering a form that allows a user to sign up by creating a new account. The component also renders a "Sign Up" button that when clicked sends a POST request to the REST API's /api/users route and signs in the user. This component also renders a "Cancel" button that returns the user to the default route (i.e. the list of courses).
-const UserSignUp = (props) => (
-  <div className="bounds">
-    <div className="grid-33 centered signin">
-      <h1>Sign Up</h1>
-      <div>
-        <form>
-          <div>
-            <input id="firstName" name="firstName" type="text" className="" placeholder="First Name" value="" />
-          </div>
-          <div>
-            <input id="lastName" name="lastName" type="text" className="" placeholder="Last Name" value="" />
-          </div>
-          <div>
-            <input id="emailAddress" name="emailAddress" type="text" className="" placeholder="Email Address" value="" />
-          </div>
-          <div>
-            <input id="password" name="password" type="password" className="" placeholder="Password" value="" />
-          </div>
-          <div>
-            <input id="confirmPassword" name="confirmPassword" type="password" className="" placeholder="Confirm Password" value="" />
-          </div>
-          <div className="grid-100 pad-bottom">
-            <button className="button" type="submit">Sign Up</button>
-            <button className="button button-secondary" onclick="event.preventDefault(); location.href='index.html';">Cancel</button>
-          </div>
-        </form>
+import React, { useContext, useState } from "react";
+import Form from "./Form";
+import { Context } from "../Context";
+
+const UserSignUp = (props) => {
+  const fields = {
+    firstName: "",
+    lastName: "",
+    emailAddress: "",
+    password: "",
+    confirmPassword: "",
+    errors: []
+  };
+
+  const [ userFields, setUserFields ] = useState(fields);
+  const { userData, actions } = useContext(Context);
+
+  const {
+    firstName,
+    lastName,
+    emailAddress,
+    password,
+    confirmPassword,
+    errors,
+  } = userFields;
+
+  const change = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+
+    setUserFields(() => {
+      return { ...userFields, [name]: value };
+    });
+  };
+
+  const handleErrors = (err) => {
+    console.log("errors: ", err);
+
+    setUserFields(() => {
+      return { ...userFields, errors: [err] };
+    });
+
+  }
+
+  const signUp = async (userFields) => {
+    // TODO: check the password and the confirm password before you call createUser, and call createUser if those passwords match
+    return await userData
+      .createUser(userFields) // from userData.js
+      // .then((response, error) => {
+      //   console.log('then: ', response);
+      //   console.log("then: ", error);
+      //   console.log(
+      //     `${emailAddress} is successfully signed up and authenticated!`
+      //   );
+      //   //actions.signIn(emailAddress, password)
+      //     //.then(() => props.history.push("/signup"));
+      // })
+      // .catch((error) => {
+      //   console.log('catch:', error);
+      // });
+      .then(() => {
+        console.log(
+          `${emailAddress} is successfully signed up and authenticated!`
+        );
+        //actions.signIn(emailAddress, password)
+        //.then(() => props.history.push("/signup"));
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.response.status === 400) {
+          console.error("error: ", err.response.data.errors);
+          handleErrors(err.response.data.errors);
+        } else if (err.response.status === 500) {
+          console.error("error: ", err.response.data.message);
+          handleErrors(err.response.data.message);
+        } else {
+          console.log(err);
+          //props.history.push('/error');
+          // console.error("Error response:");
+          // console.error(err.response.data.errors); // ***
+          // console.error(err.response.status); // ***
+          // console.error(err.response.headers); // ***
+        }
+      });
+  };
+
+  const submit = () => {
+    const user = {
+      firstName,
+      lastName,
+      emailAddress,
+      password,
+      confirmPassword,
+    };
+
+    signUp(user);
+
+    // await userData
+    //   .createUser(user) // createUser() is an asynchronous operation that returns a promise. The resolved value of the promise is either an array of errors (sent from the API if the response is 400), or an empty array (if the response is 201).
+    //   .then((response, error) => {
+    //     console.log('then: ', response);
+    //     console.log("then: ", error);
+    //     console.log(
+    //       `${emailAddress} is successfully signed up and authenticated!`
+    //     );
+    //     //actions.signIn(emailAddress, password)
+    //       //.then(() => props.history.push("/signup"));
+    //   })
+    //   .catch((error) => {
+    //     console.log('catch:', error);
+    //   });
+  };
+
+  const cancel = () => {
+    props.history.push("/");
+  };
+
+  return (
+    <div className="bounds">
+      <div className="grid-33 centered signin">
+        <h1>Sign Up</h1>
+        <div>
+          <Form
+            cancel={cancel}
+            errors={errors}
+            submit={submit}
+            submitButtonText="Sign Up"
+            elements={() => (
+              <React.Fragment>
+                <div>
+                  <input
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    className=""
+                    placeholder="First Name"
+                    value={firstName}
+                    onChange={change}
+                  />
+                </div>
+                <div>
+                  <input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    className=""
+                    placeholder="Last Name"
+                    value={lastName}
+                    onChange={change}
+                  />
+                </div>
+                <div>
+                  <input
+                    id="emailAddress"
+                    name="emailAddress"
+                    type="text"
+                    className=""
+                    placeholder="Email Address"
+                    value={emailAddress}
+                    onChange={change}
+                  />
+                </div>
+                <div>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    className=""
+                    placeholder="Password"
+                    value={password}
+                    onChange={change}
+                  />
+                </div>
+                <div>
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    className=""
+                    placeholder="Confirm Password"
+                    value={confirmPassword}
+                    onChange={change}
+                  />
+                </div>
+              </React.Fragment>
+            )}
+          />
+        </div>
+        <p>&nbsp;</p>
+        <p>
+          Already have a user account? <a href="/signin">Click here</a> to sign
+          in!
+        </p>
       </div>
-      <p>&nbsp;</p>
-      <p>Already have a user account? <a href="sign-in.html">Click here</a> to sign in!</p>
     </div>
-  </div>
-);
+  );
+};
 
 export default UserSignUp;
