@@ -11,7 +11,7 @@ const CourseDetail = ({ match }) => {
 
   console.log("course detail id: ", id);
 
-  const { courseData, actions } = React.useContext(Context);
+  const { authUser, courseData, actions } = React.useContext(Context);
 
   useEffect(() => {
     actions.getCourseById(id);
@@ -26,14 +26,19 @@ const CourseDetail = ({ match }) => {
       <div className="actions--bar">
         <div className="bounds">
           <div className="grid-100">
-            <span>
-              <NavLink className="button" to={`/courses/${id}/update`}>
-                Update Course
-              </NavLink>
-              <a className="button" href="/">
-                Delete Course
-              </a>
-            </span>
+            {authUser ? (
+              <span>
+                <NavLink className="button" to={`/courses/${id}/update`}>
+                  Update Course
+                </NavLink>
+                <a className="button" href="/">
+                  Delete Course
+                </a>
+              </span>
+            )
+            : (
+              ''
+            )}
             <NavLink className="button button-secondary" to="/">
               Return to List
             </NavLink>

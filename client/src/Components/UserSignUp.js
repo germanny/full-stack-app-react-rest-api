@@ -2,6 +2,7 @@
 import React, { useContext, useState } from "react";
 import Form from "./Form";
 import { Context } from "../Context";
+import axios from "axios";
 
 const UserSignUp = (props) => {
   const fields = {
@@ -43,47 +44,38 @@ const UserSignUp = (props) => {
 
   }
 
-  const signUp = async (userFields) => {
-    // TODO: check the password and the confirm password before you call createUser, and call createUser if those passwords match
-    return await userData
-      .createUser(userFields) // from userData.js
-      // .then((response, error) => {
-      //   console.log('then: ', response);
-      //   console.log("then: ", error);
-      //   console.log(
-      //     `${emailAddress} is successfully signed up and authenticated!`
-      //   );
-      //   //actions.signIn(emailAddress, password)
-      //     //.then(() => props.history.push("/signup"));
-      // })
-      // .catch((error) => {
-      //   console.log('catch:', error);
-      // });
-      .then(() => {
-        console.log(
-          `${emailAddress} is successfully signed up and authenticated!`
-        );
-        //actions.signIn(emailAddress, password)
-        //.then(() => props.history.push("/signup"));
+  const signUp = (userFields) => {
+    console.log("signUp started");
+    console.log("userFields: ", userFields);
+
+    const { from } = props.location.state || {
+      from: { pathname: "/" },
+    };
+    console.log("from: ", from);
+
+    if (password !== confirmPassword) {
+      return handleErrors("Sorry, your passwords do not match.");
+    }
+
+    userData.createUser(userFields)
+      .then((response) => {
+        console.log("then: ", response);
+
+        actions
+          .signIn(emailAddress, password)
+          .then(() => {
+            console.log(
+              `${emailAddress} is successfully signed up and authenticated!`
+            );
+            props.history.push(from)
+          });
       })
-      .catch((err) => {
-        console.log(err);
-        if (err.response.status === 400) {
-          console.error("error: ", err.response.data.errors);
-          handleErrors(err.response.data.errors);
-        } else if (err.response.status === 500) {
-          console.error("error: ", err.response.data.message);
-          handleErrors(err.response.data.message);
-        } else {
-          console.log(err);
-          //props.history.push('/error');
-          // console.error("Error response:");
-          // console.error(err.response.data.errors); // ***
-          // console.error(err.response.status); // ***
-          // console.error(err.response.headers); // ***
-        }
+      .catch((error) => {
+        console.log("catch:", error);
       });
-  };
+
+    console.log('done?');
+  }
 
   const submit = () => {
     const user = {
@@ -94,22 +86,9 @@ const UserSignUp = (props) => {
       confirmPassword,
     };
 
-    signUp(user);
+    console.log("submit user: ", user);
 
-    // await userData
-    //   .createUser(user) // createUser() is an asynchronous operation that returns a promise. The resolved value of the promise is either an array of errors (sent from the API if the response is 400), or an empty array (if the response is 201).
-    //   .then((response, error) => {
-    //     console.log('then: ', response);
-    //     console.log("then: ", error);
-    //     console.log(
-    //       `${emailAddress} is successfully signed up and authenticated!`
-    //     );
-    //     //actions.signIn(emailAddress, password)
-    //       //.then(() => props.history.push("/signup"));
-    //   })
-    //   .catch((error) => {
-    //     console.log('catch:', error);
-    //   });
+    signUp(user);
   };
 
   const cancel = () => {

@@ -9,7 +9,9 @@ export const Provider = (props) => {
   const [courseData, getCourseData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [courseId, getCourseById] = useState("");
-  const [authUser, setAuthUser] = useState({});
+  const [authUser, setAuthUser] = useState(
+    Cookies.getJSON("authenticatedUser") || null
+  );
 
   // COURSE DATA
   const data = new CourseData();
@@ -27,38 +29,32 @@ export const Provider = (props) => {
   // USER DATA
   const userData = new UserData();
 
-  // Set user state
-  const handleAuthUser = (user) => {
-    setAuthUser(() => {
-      // check if user passed in is not null, and return user value
-      if (user !== null) return user;
-
-      // if user === null, check if userCookie is not null and return as user value
-      const userCookie = Cookies.getJSON("authenticatedUser");
-      if (userCookie !== null) return userCookie;
-
-      // Everything failed, user not auth'd; return null
-      return null;
-    });
-  };
-
   const signIn = async (emailAddress, password) => {
-    const user = await userData
-      .getUser(emailAddress, password)
-      .then((data) => data.data); // from userData.js
+    console.log('signIn started');
+    const user = await userData // from userData.js
+      .getUser(emailAddress, password);
+      // .then((response) => {
+      //   console.log('context getuser response: ', response);
+      //   return response.data;
+      // }, (error) => {
+      //   console.log(error);
+      // })
+
+    console.log('user gotten: ', user);
 
     if (user !== null) {
-      handleAuthUser(user);
+      setAuthUser(user);
 
       // Set a login cookie
       Cookies.set("authenticatedUser", JSON.stringify(user), { expires: 1 });
+      console.log('cookie set');
     }
 
     return user;
   };
 
   const signOut = () => {
-    handleAuthUser(null);
+    setAuthUser(null);
 
     // Remove login cookie
     Cookies.remove("authenticatedUser");
@@ -74,7 +70,6 @@ export const Provider = (props) => {
         userData,
         actions: {
           getCourseById,
-          handleAuthUser,
           signIn,
           signOut,
         },

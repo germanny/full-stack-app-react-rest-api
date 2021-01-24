@@ -9,6 +9,8 @@ const UserSignIn = (props) => {
     password: "",
   };
 
+  console.log(props);
+
   const [errors, setErrors] = useState([]);
   const [user, setUser] = useState(fields);
   const { actions } = useContext(Context);
@@ -28,9 +30,10 @@ const UserSignIn = (props) => {
 
   const submit = () => {
     const { from } = props.location.state || {
-      from: { pathname: "/signin" },
+      from: { pathname: "/" },
     };
 
+    console.log(from);
     actions
       .signIn(emailAddress, password)
       .then((user) => {
