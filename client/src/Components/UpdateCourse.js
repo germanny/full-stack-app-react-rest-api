@@ -1,20 +1,23 @@
 // STATEFUL This component provides the "Update Course" screen by rendering a form that allows a user to update one of their existing courses. The component also renders an "Update Course" button that when clicked sends a PUT request to the REST API's /api/courses/:id route. This component also renders a "Cancel" button that returns the user to the "Course Detail" screen.
 import React, { useContext, useEffect, useState } from "react";
-import FormCourse from "./FormCourse";
-import { Context } from "./Context";
+import Form from "./Form";
+import { Context } from "../Context";
 
 const UpdateCourse = (props) => {
   const {
     params: { id },
   } = props.match;
-  console.log("updateCourse id: ", id);
-  console.log(props);
 
-  const { courseData, actions } = useContext(Context);
+  // console.log("updateCourse id: ", id);
+  // console.log(props);
+
+  const { courseData, data, actions } = useContext(Context);
 
   useEffect(() => {
-    actions.setCourseId(id);
+    actions.getCourseById(id);
   });
+
+  // console.log(courseData);
 
   const courseDataFields = {
     title: courseData.title || "",
@@ -27,7 +30,7 @@ const UpdateCourse = (props) => {
   const [fields, setFields] = useState(courseDataFields);
   //const [userId, setUserId] = useState("");
 
-  console.log(fields);
+  // console.log(fields);
 
   const userName = !courseData.User
     ? ""
@@ -43,31 +46,26 @@ const UpdateCourse = (props) => {
   };
 
   const submit = () => {
-    console.log("fields: ", fields);
-    //title
-    // description;
-    // estimatedTime;
-    // materialsNeeded;
-    // const { context } = props;
-    // const { from } = props.location.state || {
-    //   from: { pathname: "/" },
-    // };
-    //const { username, password } = this.state;
+    // console.log("fields: ", fields);
+    const { from } = props.location.state || {
+      from: { pathname: "/" },
+    };
 
-    // context.actions
-    //   .signIn(username, password)
-    //   .then((user) => {
-    //     if (user === null) {
-    //       return { errors: ["Sign in was unsuccessful"] };
-    //     } else {
-    //       props.history.push(from);
-    //       console.log(`Success! ${username} is now signed in.`);
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     props.history.push("/error");
-    //   });
+    data
+      //.signIn(username, password)
+      .updateCourse(fields)
+      .then((course) => {
+        if (course === null) {
+          return { errors: ["Could not update Course"] };
+        } else {
+          props.history.push(from);
+          console.log(`Success! ${fields.title} was updated.`);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        props.history.push("/error");
+      });
   };
 
   const cancel = () => {
@@ -78,7 +76,7 @@ const UpdateCourse = (props) => {
     <div className="bounds course--detail">
       <h1>Update Course</h1>
       <div>
-        <FormCourse
+        <Form
           cancel={cancel}
           errors={errors}
           submit={submit}

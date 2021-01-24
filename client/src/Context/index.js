@@ -1,12 +1,28 @@
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import CourseData from "../Data/courseData";
 import UserData from "../Data/userData";
 
 export const Context = React.createContext();
 
 export const Provider = (props) => {
+  const [courseData, getCourseData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [courseId, getCourseById] = useState("");
   const [authUser, setAuthUser] = useState({});
 
+  // COURSE DATA
+  const data = new CourseData();
+
+  useEffect(() => {
+    const data = new CourseData();
+
+    data
+      .courseApi(`/courses/${courseId}`)
+      .then((response) => getCourseData(response.data))
+      .catch((error) => console.log("Error fetching and parsing data", error))
+      .finally(() => setIsLoading(false));
+  }, [courseId]);
 
   // USER DATA
   const userData = new UserData();
@@ -51,9 +67,13 @@ export const Provider = (props) => {
   return (
     <Context.Provider
       value={{
+        courseData,
+        data,
+        isLoading,
         authUser,
         userData,
         actions: {
+          getCourseById,
           handleAuthUser,
           signIn,
           signOut,

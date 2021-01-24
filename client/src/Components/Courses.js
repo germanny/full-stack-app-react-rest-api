@@ -1,7 +1,7 @@
 // STATEFUL This component provides the "Courses" screen by retrieving the list of courses from the REST API's /api/courses route and rendering a list of courses. Each course needs to link to its respective "Course Detail" screen. This component also renders a link to the "Create Course" screen.
 import React, { useEffect } from "react";
 import { NavLink, Route } from "react-router-dom";
-import { Context } from "./Context";
+import { Context } from "../Context";
 import Course from "./Course";
 import CreateCourse from "./CreateCourse";
 import NoCourses from "./NoCourses";
@@ -10,7 +10,7 @@ const Courses = () => {
   const { actions, courseData, isLoading } = React.useContext(Context);
 
   useEffect(() => {
-    actions.setCourseId("");
+    actions.getCourseById("");
   });
 
   let courses;

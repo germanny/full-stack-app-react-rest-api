@@ -1,8 +1,7 @@
 // STATEFUL This component provides the "Course Detail" screen by retrieving the detail for a course from the REST API's /api/courses/:id route and rendering the course. The component also renders a "Delete Course" button that when clicked should send a DELETE request to the REST API's /api/courses/:id route in order to delete a course. This component also renders an "Update Course" button for navigating to the "Update Course" screen.
 import React, { useEffect } from "react";
 import { NavLink, Route } from "react-router-dom";
-import { Context } from "./Context";
-import CreateCourse from "./CreateCourse";
+import { Context } from "../Context";
 import UpdateCourse from "./UpdateCourse";
 
 const CourseDetail = ({ match }) => {
@@ -15,7 +14,7 @@ const CourseDetail = ({ match }) => {
   const { courseData, actions } = React.useContext(Context);
 
   useEffect(() => {
-    actions.setCourseId(id);
+    actions.getCourseById(id);
   });
 
   const userName = !courseData.User

@@ -1,6 +1,6 @@
 // STATEFUL This component provides the "Create Course" screen by rendering a form that allows a user to create a new course. The component also renders a "Create Course" button that when clicked sends a POST request to the REST API's /api/courses route. This component also renders a "Cancel" button that returns the user to the default route (i.e. the list of courses).
 import React, { useState } from "react";
-import FormCourse from "./FormCourse";
+import Form from "./Form";
 
 const CreateCourse = (props) => {
   const [errors, setErrors] = useState([]);
@@ -15,6 +15,8 @@ const CreateCourse = (props) => {
       };
     });
   };
+
+  setErrors(() => console.log("hi"));
 
   const submit = () => {
     console.log("course created, sort of");
@@ -57,7 +59,7 @@ const CreateCourse = (props) => {
             </ul>
           </div>
         </div>
-        <FormCourse
+        <Form
           cancel={cancel}
           errors={errors}
           submit={submit}
@@ -75,6 +77,7 @@ const CreateCourse = (props) => {
                       className="input-title course--title--input"
                       placeholder="Course title..."
                       value=""
+                      onChange={change}
                     />
                   </div>
                   <p>By Joe Smith</p>
@@ -86,6 +89,7 @@ const CreateCourse = (props) => {
                       name="description"
                       className=""
                       placeholder="Course description..."
+                      onChange={change}
                     ></textarea>
                   </div>
                 </div>
@@ -103,6 +107,7 @@ const CreateCourse = (props) => {
                           className="course--time--input"
                           placeholder="Hours"
                           value=""
+                          onChange={change}
                         />
                       </div>
                     </li>
@@ -114,6 +119,7 @@ const CreateCourse = (props) => {
                           name="materialsNeeded"
                           className=""
                           placeholder="List materials..."
+                          onChange={change}
                         ></textarea>
                       </div>
                     </li>
