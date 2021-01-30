@@ -13,7 +13,12 @@ const CourseDetail = ({ match }) => {
   console.log("course detail id: ", id);
 
   const { courseData, actions } = useContext(Context);
-  const { authUser, authActions } = useContext(authContext);
+  const { authUser } = useContext(authContext);
+
+  console.log(authUser.id);
+  console.log(courseData.userId);
+
+  const isAuthUser = authUser.id === courseData.userId;
 
   useEffect(() => {
     actions.getCourseById(id);
@@ -28,7 +33,7 @@ const CourseDetail = ({ match }) => {
       <div className="actions--bar">
         <div className="bounds">
           <div className="grid-100">
-            {authUser ? (
+            {isAuthUser ? (
               <span>
                 <NavLink className="button" to={`/courses/${id}/update`}>
                   Update Course
@@ -37,9 +42,8 @@ const CourseDetail = ({ match }) => {
                   Delete Course
                 </a>
               </span>
-            )
-            : (
-              ''
+            ) : (
+              ""
             )}
             <NavLink className="button button-secondary" to="/">
               Return to List
