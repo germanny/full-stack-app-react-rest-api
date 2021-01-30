@@ -13,7 +13,6 @@ const ProvideAuth = (props) => {
   const userData = new UserData();
 
   const signIn = async (emailAddress, password) => {
-    console.log("signIn started");
     const user = await userData // from userData.js
       .getUser(emailAddress, password);
 

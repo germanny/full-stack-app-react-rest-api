@@ -39,22 +39,21 @@ export default class UserData {
     }).then(
       (response) => {
         if (response.status === 200) {
-          console.log("getUser response: ", response);
           return response.data;
         } else if (response.status === 401) {
           return null;
         }
       },
-        (error) => {
-          console.log("getUser error: ", error);
-          throw new Error();
-        }
+      (err) => {
+        console.log(err);
+        throw new Error();
+      }
     );
   }
 
   async createUser(user) {
     this.userApi("POST", "/users", user)
-      .then((res) => console.log('then res: ', res))
-      .catch((err) => console.log("Login: ", err));
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
   }
 }
