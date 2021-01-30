@@ -1,7 +1,7 @@
 // STATEFUL This component provides the "Sign In" screen by rendering a form that allows a user to sign using their existing account information. The component also renders a "Sign In" button that when clicked signs in the user and a "Cancel" button that returns the user to the default route (i.e. the list of courses).
 import React, { useContext, useState } from "react";
 import Form from "./Form";
-import { Context } from "../Context";
+import { authContext } from "../Context/auth";
 
 const UserSignIn = (props) => {
   const fields = {
@@ -9,11 +9,9 @@ const UserSignIn = (props) => {
     password: "",
   };
 
-  console.log(props);
-
   const [errors, setErrors] = useState([]);
   const [user, setUser] = useState(fields);
-  const { actions } = useContext(Context);
+  const { authActions } = useContext(authContext);
 
   const { emailAddress, password } = user;
 
@@ -24,8 +22,6 @@ const UserSignIn = (props) => {
     setUser(() => {
       return { ...user, [name]: value };
     });
-
-    console.log("user from change function: ", user);
   };
 
   const submit = () => {
@@ -33,13 +29,12 @@ const UserSignIn = (props) => {
       from: { pathname: "/" },
     };
 
-    console.log(from);
-    actions
+    authActions
       .signIn(emailAddress, password)
       .then((user) => {
         if (user === null) {
           setErrors({ errors: ["Sign in was unsuccessful"] });
-          return {  errors  };
+          return { errors };
         } else {
           props.history.push(from);
           console.log(`Success! ${emailAddress} is now signed in.`);

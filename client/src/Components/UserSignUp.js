@@ -1,8 +1,7 @@
 // STATEFUL This component provides the "Sign Up" screen by rendering a form that allows a user to sign up by creating a new account. The component also renders a "Sign Up" button that when clicked sends a POST request to the REST API's /api/users route and signs in the user. This component also renders a "Cancel" button that returns the user to the default route (i.e. the list of courses).
 import React, { useContext, useState } from "react";
 import Form from "./Form";
-import { Context } from "../Context";
-import axios from "axios";
+import { authContext } from "../Context/auth";
 
 const UserSignUp = (props) => {
   const fields = {
@@ -15,7 +14,7 @@ const UserSignUp = (props) => {
   };
 
   const [ userFields, setUserFields ] = useState(fields);
-  const { userData, actions } = useContext(Context);
+  const { userData, authActions } = useContext(authContext);
 
   const {
     firstName,
@@ -36,8 +35,6 @@ const UserSignUp = (props) => {
   };
 
   const handleErrors = (err) => {
-    console.log("errors: ", err);
-
     setUserFields(() => {
       return { ...userFields, errors: [err] };
     });
@@ -45,23 +42,17 @@ const UserSignUp = (props) => {
   }
 
   const signUp = (userFields) => {
-    console.log("signUp started");
-    console.log("userFields: ", userFields);
-
     const { from } = props.location.state || {
       from: { pathname: "/" },
     };
-    console.log("from: ", from);
 
     if (password !== confirmPassword) {
       return handleErrors("Sorry, your passwords do not match.");
     }
 
     userData.createUser(userFields)
-      .then((response) => {
-        console.log("then: ", response);
-
-        actions
+      .then(() => {
+        authActions
           .signIn(emailAddress, password)
           .then(() => {
             console.log(
@@ -70,11 +61,9 @@ const UserSignUp = (props) => {
             props.history.push(from)
           });
       })
-      .catch((error) => {
-        console.log("catch:", error);
+      .catch((err) => {
+        console.log(err);
       });
-
-    console.log('done?');
   }
 
   const submit = () => {
@@ -85,8 +74,6 @@ const UserSignUp = (props) => {
       password,
       confirmPassword,
     };
-
-    console.log("submit user: ", user);
 
     signUp(user);
   };

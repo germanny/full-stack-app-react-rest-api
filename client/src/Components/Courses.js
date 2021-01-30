@@ -2,12 +2,14 @@
 import React, { useContext, useEffect } from "react";
 import { NavLink, Route } from "react-router-dom";
 import { Context } from "../Context";
+import { authContext } from "../Context/auth";
 import Course from "./Course";
 import CreateCourse from "./CreateCourse";
 import NoCourses from "./NoCourses";
 
 const Courses = () => {
-  const { actions, authUser, courseData, isLoading } = useContext(Context);
+  const { courseData, isLoading, actions } = useContext(Context);
+  const { authUser, authActions } = useContext(authContext);
 
   useEffect(() => {
     actions.getCourseById("");
