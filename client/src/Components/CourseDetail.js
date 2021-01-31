@@ -10,13 +10,8 @@ const CourseDetail = ({ match }) => {
     params: { id },
   } = match;
 
-  console.log("course detail id: ", id);
-
   const { courseData, actions } = useContext(Context);
   const { authUser } = useContext(authContext);
-
-  console.log(authUser.id);
-  console.log(courseData.userId);
 
   const isAuthUser = authUser.id === courseData.userId;
 
