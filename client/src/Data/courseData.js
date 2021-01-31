@@ -5,7 +5,7 @@ export default class CourseData {
   courseApi(
     path,
     method = "GET",
-    body = null,
+    data = null,
     requiresAuth = false,
     credentials = null
   ) {
@@ -14,13 +14,17 @@ export default class CourseData {
     const options = {
       method,
       url,
+      data,
       headers: {
         "Content-Type": "application/json; charset=utf-8",
       },
     };
 
-    if (body !== null) {
-      options.data = JSON.stringify(body);
+    if (requiresAuth) {
+      options.auth = {
+        username: credentials.emailAddress,
+        password: credentials.password,
+      };
     }
 
     return axios(options);
@@ -40,18 +44,27 @@ export default class CourseData {
   }
 
   async getCourse(url) {
-    const response = await this.courseApi(url, "GET", null, true);
-    if (response.status === 200) {
-      return response.json().then((data) => data);
-    } else if (response.status === 401) {
-      return null;
-    } else {
-      throw new Error();
-    }
+    return await this.userApi(url, "GET", null).then(
+      (response) => {
+        if (response.status === 200) {
+          return response.data;
+        } else if (response.status === 401) {
+          return null;
+        }
+      },
+        (err) => {
+          console.log(err);
+          throw new Error();
+        }
+    );
   }
 
-  async updateCourse(courseData) {
-    const response = await this.courseApi("/courses", "POST", courseData);
+  async updateCourse(url, courseData, emailAddress, password) {
+    const response = await this.courseApi(url, "PUT", courseData, true, {
+      emailAddress,
+      password,
+    });
+
     if (response.status === 204) {
       return [];
     } else if (response.status === 400) {
