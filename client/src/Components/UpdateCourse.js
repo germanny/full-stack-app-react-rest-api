@@ -2,39 +2,30 @@
 import React, { useContext, useEffect, useState } from "react";
 import Form from "./Form";
 import { Context } from "../Context";
+import { authContext } from "../Context/auth";
 
 const UpdateCourse = (props) => {
   const {
     params: { id },
   } = props.match;
 
-  // console.log("updateCourse id: ", id);
-  // console.log(props);
-
+  const { authUser } = useContext(authContext);
   const { courseData, data, actions } = useContext(Context);
 
   useEffect(() => {
-    actions.getCourseById(id);
+    const fetchData = async () => {
+      await actions.getCourseById(id);
+    };
+
+    fetchData();
   });
 
-  // console.log(courseData);
-
-  const courseDataFields = {
-    title: courseData.title || "",
-    description: courseData.description || "",
-    estimatedTime: courseData.estimatedTime || "",
-    materialsNeeded: courseData.materialsNeeded || "",
-  };
-
   const [errors, setErrors] = useState([]);
-  const [fields, setFields] = useState(courseDataFields);
-  //const [userId, setUserId] = useState("");
+  const [fields, setFields] = useState(courseData);
 
-  // console.log(fields);
-
-  const userName = !courseData.User
-    ? ""
-    : `${courseData.User.firstName} ${courseData.User.lastName}`;
+  const userName = courseData.User
+    ? `${courseData.User.firstName} ${courseData.User.lastName}`
+    : '';
 
   const change = (e) => {
     const name = e.target.name;
@@ -46,26 +37,23 @@ const UpdateCourse = (props) => {
   };
 
   const submit = () => {
-    // console.log("fields: ", fields);
-    const { from } = props.location.state || {
-      from: { pathname: "/" },
+    const updatedFields = {
+      title: fields.title || courseData.title,
+      description: fields.description || courseData.description,
+      estimatedTime: fields.estimatedTime || courseData.estimatedTime,
+      materialsNeeded: fields.materialsNeeded || courseData.materialsNeeded,
+      userId: authUser.id,
     };
 
     data
-      //.signIn(username, password)
-      .updateCourse(fields)
-      .then((course) => {
-        if (course === null) {
-          return { errors: ["Could not update Course"] };
-        } else {
-          props.history.push(from);
-          console.log(`Success! ${fields.title} was updated.`);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        props.history.push("/error");
-      });
+      .updateCourse(
+        `/courses/${id}`,
+        updatedFields,
+        authUser.emailAddress,
+        atob(authUser.cred)
+      )
+      //.then(() => props.history.push(`/courses/${id}`))
+      .catch((err) => console.log(err));
   };
 
   const cancel = () => {
