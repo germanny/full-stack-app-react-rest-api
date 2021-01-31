@@ -13,10 +13,10 @@ const ProvideAuth = (props) => {
   const userData = new UserData();
 
   const signIn = async (emailAddress, password) => {
-    const user = await userData // from userData.js
-      .getUser(emailAddress, password);
+    const user = await userData.getUser(emailAddress, password);
 
     if (user !== null) {
+      user.cred = btoa(password);
       setAuthUser(user);
 
       // Set a login cookie
