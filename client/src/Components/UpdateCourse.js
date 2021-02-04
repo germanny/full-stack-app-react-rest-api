@@ -45,9 +45,10 @@ const UpdateCourse = (props) => {
       userId: authUser.id,
     };
 
+    // TODO: Uncomment .then() ⬇
     data
       .updateCourse(
-        `/courses/${id}`,
+        id,
         updatedFields,
         authUser.emailAddress,
         atob(authUser.cred)
