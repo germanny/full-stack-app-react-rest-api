@@ -1,64 +1,85 @@
 // STATEFUL This component provides the "Create Course" screen by rendering a form that allows a user to create a new course. The component also renders a "Create Course" button that when clicked sends a POST request to the REST API's /api/courses route. This component also renders a "Cancel" button that returns the user to the default route (i.e. the list of courses).
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Form from "./Form";
+import { Context } from "../Context";
+import { authContext } from "../Context/auth";
 
 const CreateCourse = (props) => {
-  const [errors, setErrors] = useState([]);
+  const fields = {
+    title: "",
+    description: "",
+    estimatedTime: "",
+    materialsNeeded: "",
+    errors: [],
+  };
 
-  const change = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
+  const [courseFields, setCourseFields] = useState(fields);
+  const { authUser } = useContext(authContext);
+  const { data } = useContext(Context);
 
-    this.setState(() => {
-      return {
-        [name]: value,
-      };
+  const {
+    title,
+    description,
+    estimatedTime,
+    materialsNeeded,
+    errors,
+  } = courseFields;
+
+  const change = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+
+    setCourseFields(() => {
+      return { ...courseFields, [name]: value };
     });
   };
 
-  setErrors(() => console.log("hi"));
+  const handleErrors = (err) => {
+    setCourseFields(() => {
+      return { ...courseFields, errors: [err] };
+    });
+  };
+
+  const addCourse = async (courseFields) => {
+    if (!title) {
+      return handleErrors('Please provide a value for "Title".');
+    }
+
+    if (!description) {
+      return handleErrors('Please provide a value for "Description".');
+    }
+
+    console.log(props);
+
+    await data
+      .createCourse(courseFields, authUser.emailAddress, atob(authUser.cred))
+      .then((response) => {
+        console.log(response);
+        props.history.push(`/`);
+      })
+      .catch((err) => console.log(err));
+  };
 
   const submit = () => {
-    console.log("course created, sort of");
-    // const { context } = props;
-    // const { from } = props.location.state || {
-    //   from: { pathname: "/" },
-    // };
-    //const { username, password } = this.state;
+    const courseFields = {
+      title,
+      description,
+      estimatedTime,
+      materialsNeeded,
+      userId: authUser.id,
+    };
 
-    // context.actions
-    //   .signIn(username, password)
-    //   .then((user) => {
-    //     if (user === null) {
-    //       return { errors: ["Sign in was unsuccessful"] };
-    //     } else {
-    //       props.history.push(from);
-    //       console.log(`Success! ${username} is now signed in.`);
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     props.history.push("/error");
-    //   });
+    addCourse(courseFields);
   };
 
   const cancel = () => {
-    props.history.push("/");
+    props.history.push(`/`);
   };
 
   return (
     <div className="bounds course--detail">
       <h1>Create Course</h1>
       <div>
-        <div>
-          <h2 className="validation--errors--label">Validation errors</h2>
-          <div className="validation-errors">
-            <ul>
-              <li>Please provide a value for "Title"</li>
-              <li>Please provide a value for "Description"</li>
-            </ul>
-          </div>
-        </div>
         <Form
           cancel={cancel}
           errors={errors}
@@ -76,7 +97,7 @@ const CreateCourse = (props) => {
                       type="text"
                       className="input-title course--title--input"
                       placeholder="Course title..."
-                      value=""
+                      value={title}
                       onChange={change}
                     />
                   </div>
@@ -89,6 +110,7 @@ const CreateCourse = (props) => {
                       name="description"
                       className=""
                       placeholder="Course description..."
+                      value={description}
                       onChange={change}
                     ></textarea>
                   </div>
@@ -106,7 +128,7 @@ const CreateCourse = (props) => {
                           type="text"
                           className="course--time--input"
                           placeholder="Hours"
-                          value=""
+                          value={estimatedTime}
                           onChange={change}
                         />
                       </div>
@@ -119,6 +141,7 @@ const CreateCourse = (props) => {
                           name="materialsNeeded"
                           className=""
                           placeholder="List materials..."
+                          value={materialsNeeded}
                           onChange={change}
                         ></textarea>
                       </div>
