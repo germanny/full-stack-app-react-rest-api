@@ -30,9 +30,38 @@ export default class CourseData {
     return axios(options);
   }
 
-  async createCourse(courseData) {
-    const response = await this.courseApi("/courses", "POST", courseData);
-    if (response.status === 201) {
+  async createCourse(courseData, emailAddress, password) {
+    return await this.courseApi("/courses", "POST", courseData, true, {
+      emailAddress,
+      password,
+    })
+      .then((response) => {
+        console.log(response);
+        if (response.status === 201) {
+          return response;
+        } else if (response.status === 400) {
+          return response.data.errors;
+        } else {
+          throw new Error();
+        }
+      })
+      .catch((err) => console.log("catch: ", err))
+      .finally((response) => console.log(response));
+  }
+
+  async updateCourse(id, courseData, emailAddress, password) {
+    const response = await this.courseApi(
+      `/courses/${id}`,
+      "PUT",
+      courseData,
+      true,
+      {
+        emailAddress,
+        password,
+      }
+    );
+
+    if (response.status === 204) {
       return [];
     } else if (response.status === 400) {
       return response.json().then((data) => {
@@ -52,27 +81,10 @@ export default class CourseData {
           return null;
         }
       },
-        (err) => {
-          console.log(err);
-          throw new Error();
-        }
+      (err) => {
+        console.log(err);
+        throw new Error();
+      }
     );
-  }
-
-  async updateCourse(url, courseData, emailAddress, password) {
-    const response = await this.courseApi(url, "PUT", courseData, true, {
-      emailAddress,
-      password,
-    });
-
-    if (response.status === 204) {
-      return [];
-    } else if (response.status === 400) {
-      return response.json().then((data) => {
-        return data.errors;
-      });
-    } else {
-      throw new Error();
-    }
   }
 }
