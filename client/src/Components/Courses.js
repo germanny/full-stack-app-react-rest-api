@@ -9,7 +9,7 @@ import NoCourses from "./NoCourses";
 
 const Courses = () => {
   const { courseData, isLoading, actions } = useContext(Context);
-  const { authUser, authActions } = useContext(authContext);
+  const { authUser } = useContext(authContext);
 
   useEffect(() => {
     actions.getCourseById("");

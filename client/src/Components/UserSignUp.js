@@ -38,7 +38,6 @@ const UserSignUp = (props) => {
     setUserFields(() => {
       return { ...userFields, errors: [err] };
     });
-
   }
 
   const signUp = (userFields) => {
