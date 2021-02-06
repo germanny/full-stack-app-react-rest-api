@@ -1,23 +1,21 @@
 // STATEFUL This component provides the "Courses" screen by retrieving the list of courses from the REST API's /api/courses route and rendering a list of courses. Each course needs to link to its respective "Course Detail" screen. This component also renders a link to the "Create Course" screen.
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { NavLink, Route } from "react-router-dom";
-import { Context } from "../Context";
+import useFetch from "../Hooks/useFetch";
 import { authContext } from "../Context/auth";
 import Course from "./Course";
 import CreateCourse from "./CreateCourse";
+import Error from "./Error";
 import NoCourses from "./NoCourses";
 
 const Courses = () => {
-  const { courseData, isLoading, actions } = useContext(Context);
   const { authUser } = useContext(authContext);
-
-  useEffect(() => {
-    actions.getCourseById("");
-  });
+  const courseData = useFetch({ path: "/courses/" });
+  const { response, error, isLoading } = courseData;
 
   let courses;
-  if (courseData.length) {
-    courses = courseData.map((course) => (
+  if (response) {
+    courses = response.data.map((course) => (
       <Course key={course.id.toString()} id={course.id} title={course.title} />
     ));
   } else {
@@ -27,6 +25,7 @@ const Courses = () => {
   return (
     <div className="bounds">
       {isLoading ? <p>Loading...</p> : courses}
+      {error ? <Error /> : ''}
 
       {authUser ? (
         <div className="grid-33">
@@ -51,11 +50,9 @@ const Courses = () => {
 
           <Route path="/courses/create" render={() => <CreateCourse />} />
         </div>
-      )
-        : (
-          ''
-        )
-      }
+      ) : (
+        ""
+      )}
     </div>
   );
 };

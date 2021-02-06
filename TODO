@@ -1,0 +1,11 @@
+
+Todo:
+  ☐ Get CRUD functions working
+  ☐ Get location header from response after course is created and route user to the new course
+  ☐ Get Auth working
+  ☐ Protected routes
+  ☐ Restrict updating and deleting
+  ☐ Display validation errors - not working for UpdateCourse yet
+  ☐ Add markdown support with https://www.npmjs.com/package/react-markdown
+  ☐ Browser Test
+  ☐ Profit

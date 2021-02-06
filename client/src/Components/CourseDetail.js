@@ -1,30 +1,32 @@
 // STATEFUL This component provides the "Course Detail" screen by retrieving the detail for a course from the REST API's /api/courses/:id route and rendering the course. The component also renders a "Delete Course" button that when clicked should send a DELETE request to the REST API's /api/courses/:id route in order to delete a course. This component also renders an "Update Course" button for navigating to the "Update Course" screen.
-import React, { useEffect, useContext } from "react";
+import React, { useContext } from "react";
 import { NavLink, Route } from "react-router-dom";
-import { Context } from "../Context";
+import useFetch from "../Hooks/useFetch";
 import { authContext } from "../Context/auth";
 import UpdateCourse from "./UpdateCourse";
+import Error from "./Error";
 
 const CourseDetail = ({ match }) => {
   const {
     params: { id },
   } = match;
 
-  const { courseData, actions } = useContext(Context);
+  const courseData = useFetch({ path: `/courses/${id}` });
+  const { response, error, isLoading } = courseData;
   const { authUser } = useContext(authContext);
 
-  const isAuthUser = authUser.id === courseData.userId;
+  const course = response ? response.data : {};
+  const isAuthUser = authUser ? authUser.id === course.userId : null;
 
-  useEffect(() => {
-    actions.getCourseById(id);
-  });
-
-  const userName = !courseData.User
+  const userName = !course.User
     ? ""
-    : `${courseData.User.firstName} ${courseData.User.lastName}`;
+    : `${course.User.firstName} ${course.User.lastName}`;
 
   return (
     <div>
+      {isLoading ? <p>Loading...</p> : ""}
+      {error ? <Error /> : ""}
+
       <div className="actions--bar">
         <div className="bounds">
           <div className="grid-100">
@@ -52,23 +54,23 @@ const CourseDetail = ({ match }) => {
           <div className="course--header">
             Course Detail
             <h4 className="course--label">Course</h4>
-            <h3 className="course--title">{courseData.title}</h3>
+            <h3 className="course--title">{course.title}</h3>
             <p>By {userName}</p>
           </div>
-          <div className="course--description">{courseData.description}</div>
+          <div className="course--description">{course.description}</div>
         </div>
         <div className="grid-25 grid-right">
           <div className="course--stats">
             <ul className="course--stats--list">
               <li className="course--stats--list--item">
                 <h4>Estimated Time</h4>
-                <h3>{courseData.estimatedTime}</h3>
+                <h3>{course.estimatedTime}</h3>
               </li>
               <li className="course--stats--list--item">
                 <h4>Materials Needed</h4>
 
                 <ul>
-                  <li>{courseData.materialsNeeded}</li>
+                  <li>{course.materialsNeeded}</li>
                 </ul>
               </li>
             </ul>

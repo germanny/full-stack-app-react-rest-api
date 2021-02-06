@@ -1,8 +1,10 @@
 // STATEFUL This component provides the "Update Course" screen by rendering a form that allows a user to update one of their existing courses. The component also renders an "Update Course" button that when clicked sends a PUT request to the REST API's /api/courses/:id route. This component also renders a "Cancel" button that returns the user to the "Course Detail" screen.
-import React, { useContext, useEffect, useState } from "react";
-import Form from "./Form";
-import { Context } from "../Context";
+import React, { useState, useContext } from "react";
 import { authContext } from "../Context/auth";
+import Form from "./Form";
+import useFetch from "../Hooks/useFetch";
+import apiUrl from "../config";
+import axios from "axios";
 
 const UpdateCourse = (props) => {
   const {
@@ -10,21 +12,15 @@ const UpdateCourse = (props) => {
   } = props.match;
 
   const { authUser } = useContext(authContext);
-  const { courseData, data, actions } = useContext(Context);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      await actions.getCourseById(id);
-    };
-
-    fetchData();
-  });
+  const courseData = useFetch({ path: `/courses/${id}`, extra: "hi" });
+  const { response, error } = courseData;
+  const course = response ? response.data : {};
 
   const [errors, setErrors] = useState([]);
-  const [fields, setFields] = useState(courseData);
+  const [fields, setFields] = useState(course);
 
-  const userName = courseData.User
-    ? `${courseData.User.firstName} ${courseData.User.lastName}`
+  const userName = course.User
+    ? `${course.User.firstName} ${course.User.lastName}`
     : '';
 
   const change = (e) => {
@@ -37,24 +33,34 @@ const UpdateCourse = (props) => {
   };
 
   const submit = () => {
-    const updatedFields = {
-      title: fields.title || courseData.title,
-      description: fields.description || courseData.description,
-      estimatedTime: fields.estimatedTime || courseData.estimatedTime,
-      materialsNeeded: fields.materialsNeeded || courseData.materialsNeeded,
-      userId: authUser.id,
-    };
+    console.log('begin submit');
+    const url = apiUrl + `/courses/${id}`;
 
-    // TODO: Uncomment .then() ⬇
-    data
-      .updateCourse(
-        id,
-        updatedFields,
-        authUser.emailAddress,
-        atob(authUser.cred)
-      )
-      //.then(() => props.history.push(`/courses/${id}`))
-      .catch((err) => console.log(err));
+    console.log("begin axios");
+    axios({
+      method: "PUT",
+      url,
+      data: {
+        title: fields.title || course.title,
+        description: fields.description || course.description,
+        estimatedTime: fields.estimatedTime || course.estimatedTime,
+        materialsNeeded: fields.materialsNeeded || course.materialsNeeded,
+        userId: course.userId,
+      },
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      auth: {
+        username: authUser.emailAddress,
+        password: atob(authUser.cred),
+      },
+    })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   };
 
   const cancel = () => {
@@ -82,7 +88,7 @@ const UpdateCourse = (props) => {
                       type="text"
                       className="input-title course--title--input"
                       placeholder="Course title..."
-                      value={fields.title || courseData.title}
+                      value={fields.title || course.title}
                       onChange={change}
                     />
                   </div>
@@ -95,7 +101,7 @@ const UpdateCourse = (props) => {
                       name="description"
                       className=""
                       placeholder="Course description..."
-                      value={fields.description || courseData.description}
+                      value={fields.description || course.description}
                       onChange={change}
                     />
                   </div>
@@ -114,7 +120,7 @@ const UpdateCourse = (props) => {
                           className="course--time--input"
                           placeholder="Hours"
                           value={
-                            fields.estimatedTime || courseData.estimatedTime
+                            fields.estimatedTime || course.estimatedTime
                           }
                           onChange={change}
                         />
@@ -129,7 +135,7 @@ const UpdateCourse = (props) => {
                           className=""
                           placeholder="List materials..."
                           value={
-                            fields.materialsNeeded || courseData.materialsNeeded
+                            fields.materialsNeeded || course.materialsNeeded
                           }
                           onChange={change}
                         />

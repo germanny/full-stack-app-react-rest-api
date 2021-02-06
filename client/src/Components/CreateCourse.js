@@ -49,8 +49,6 @@ const CreateCourse = (props) => {
       return handleErrors('Please provide a value for "Description".');
     }
 
-    console.log(props);
-
     await data
       .createCourse(courseFields, authUser.emailAddress, atob(authUser.cred))
       .then((response) => {
