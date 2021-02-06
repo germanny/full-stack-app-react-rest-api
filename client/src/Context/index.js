@@ -1,38 +1,50 @@
-import React, { useState, useEffect } from "react";
-import CourseData from "../Data/courseData";
+import React, { useState } from "react";
+import Cookies from "js-cookie";
+import UserData from "../Data/userData";
 
-export const Context = React.createContext();
+export const authContext = React.createContext();
 
-export const Provider = (props) => {
-  const [courseData, getCourseData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [courseId, getCourseById] = useState("");
+export const ProvideAuth = (props) => {
+  const [authUser, setAuthUser] = useState(
+    Cookies.getJSON("authenticatedUser") || null
+  );
 
-  // COURSE DATA
-  const data = new CourseData();
+  // USER DATA
+  const userData = new UserData();
 
-  useEffect(() => {
-    const data = new CourseData();
+  const signIn = async (emailAddress, password) => {
+    const user = await userData.getUser(emailAddress, password);
 
-    data
-      .courseApi(`/courses/${courseId}`)
-      .then((response) => getCourseData(response.data))
-      .catch((err) => console.log("Error fetching and parsing data", err))
-      .finally(() => setIsLoading(false));
-  }, [courseId]);
+    if (user !== null) {
+      user.cred = btoa(password);
+      setAuthUser(user);
+
+      // Set a login cookie
+      Cookies.set("authenticatedUser", JSON.stringify(user), { expires: 1 });
+    }
+
+    return user;
+  };
+
+  const signOut = () => {
+    setAuthUser(null);
+
+    // Remove login cookie
+    Cookies.remove("authenticatedUser");
+  };
 
   return (
-    <Context.Provider
+    <authContext.Provider
       value={{
-        courseData,
-        data,
-        isLoading,
-        actions: {
-          getCourseById,
+        authUser,
+        userData,
+        authActions: {
+          signIn,
+          signOut,
         },
       }}
     >
       {props.children}
-    </Context.Provider>
+    </authContext.Provider>
   );
 };

@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import ProvideAuth from "./Context/auth";
 
 import CourseDetail from "./Components/CourseDetail";
 import Courses from "./Components/Courses";
@@ -16,31 +15,26 @@ import UserSignUp from "./Components/UserSignUp";
 
 const App = () => {
   return (
-    <ProvideAuth>
-      <BrowserRouter>
-        <div className="App">
-          <div>
-            <Header />
-            <hr />
+    <BrowserRouter>
+      <div className="App">
+        <div>
+          <Header />
+          <hr />
 
-            <Switch>
-              <Route exact path="/" component={Courses} />
-              <PrivateRoute path="/courses/create" component={CreateCourse} />
-              <PrivateRoute
-                path="/courses/:id/update"
-                component={UpdateCourse}
-              />
-              <Route path="/courses/:id" component={CourseDetail} />
-              <Route path="/signin" component={UserSignIn} />
-              <Route path="/signup" component={UserSignUp} />
-              <Route path="/signout" component={UserSignOut} />
-              <Route path="/error" component={Error} />
-              <Route component={NotFound} />
-            </Switch>
-          </div>
+          <Switch>
+            <Route exact path="/" component={Courses} />
+            <PrivateRoute path="/courses/create" component={CreateCourse} />
+            <PrivateRoute path="/courses/:id/update" component={UpdateCourse} />
+            <Route path="/courses/:id" component={CourseDetail} />
+            <Route path="/signin" component={UserSignIn} />
+            <Route path="/signup" component={UserSignUp} />
+            <Route path="/signout" component={UserSignOut} />
+            <Route path="/error" component={Error} />
+            <Route path="/notfound" component={NotFound} />
+          </Switch>
         </div>
-      </BrowserRouter>
-    </ProvideAuth>
+      </div>
+    </BrowserRouter>
   );
 };
 

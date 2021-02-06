@@ -3,15 +3,15 @@ import ReactDOM from "react-dom";
 
 import "./styles/global.css";
 
-import { Provider } from "./Context";
+import { ProvideAuth } from "./Context";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider>
+    <ProvideAuth>
       <App />
-    </Provider>
+    </ProvideAuth>
   </React.StrictMode>,
   document.getElementById("root")
 );

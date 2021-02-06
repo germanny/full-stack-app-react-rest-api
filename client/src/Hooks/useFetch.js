@@ -35,18 +35,18 @@ export default function useFetch({
       try {
         await axios(options)
           .then((res) => {
-            console.log(res);
+            console.log("res: ", res);
             setResponse(res);
           })
           .catch((err) => {
-            console.log(err);
+            console.log("err: ", err);
             setError(err);
           })
           .finally(() => {
             setIsLoading(false);
           });
       } catch (err) {
-        console.log(err);
+        console.log("err: ", err);
         setError(err);
       }
     };

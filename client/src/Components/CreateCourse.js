@@ -1,8 +1,9 @@
 // STATEFUL This component provides the "Create Course" screen by rendering a form that allows a user to create a new course. The component also renders a "Create Course" button that when clicked sends a POST request to the REST API's /api/courses route. This component also renders a "Cancel" button that returns the user to the default route (i.e. the list of courses).
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import Form from "./Form";
-import { Context } from "../Context";
-import { authContext } from "../Context/auth";
+import { authContext } from "../Context";
+import apiUrl from "../config";
+import axios from "axios";
 
 const CreateCourse = (props) => {
   const fields = {
@@ -15,7 +16,6 @@ const CreateCourse = (props) => {
 
   const [courseFields, setCourseFields] = useState(fields);
   const { authUser } = useContext(authContext);
-  const { data } = useContext(Context);
 
   const {
     title,
@@ -49,13 +49,33 @@ const CreateCourse = (props) => {
       return handleErrors('Please provide a value for "Description".');
     }
 
-    await data
-      .createCourse(courseFields, authUser.emailAddress, atob(authUser.cred))
+    return await axios({
+      url: apiUrl + "/courses",
+      method: "POST",
+      data: courseFields,
+      auth: {
+        username: authUser.emailAddress,
+        password: atob(authUser.cred),
+      },
+    })
       .then((response) => {
-        console.log(response);
+        console.log("create course response", response);
+        if (response.status === 201) {
+          return response;
+        } else if (response.status === 400) {
+          return response.data.errors;
+        } else {
+          throw new Error();
+        }
+      })
+      .then((response) => {
+        console.log("create course 2nd then response", response);
         props.history.push(`/`);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log("catch: ", err))
+      .finally((response) =>
+        console.log("create course finally response", response)
+      );
   };
 
   const submit = () => {

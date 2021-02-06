@@ -2,7 +2,7 @@
 import React, { useContext } from "react";
 import { NavLink, Route } from "react-router-dom";
 import useFetch from "../Hooks/useFetch";
-import { authContext } from "../Context/auth";
+import { authContext } from "../Context";
 import UpdateCourse from "./UpdateCourse";
 import Error from "./Error";
 
