@@ -3,8 +3,11 @@ import React, { useContext } from "react";
 import { NavLink, Route } from "react-router-dom";
 import useFetch from "../Hooks/useFetch";
 import { authContext } from "../Context";
+import { useHistory } from "react-router-dom";
 import UpdateCourse from "./UpdateCourse";
 import Error from "./Error";
+import apiUrl from "../config";
+import axios from "axios";
 
 const CourseDetail = ({ match }) => {
   const {
@@ -14,6 +17,7 @@ const CourseDetail = ({ match }) => {
   const courseData = useFetch({ path: `/courses/${id}` });
   const { response, error, isLoading } = courseData;
   const { authUser } = useContext(authContext);
+  const history = useHistory();
 
   const course = response ? response.data : {};
   const isAuthUser = authUser ? authUser.id === course.userId : null;
@@ -21,6 +25,47 @@ const CourseDetail = ({ match }) => {
   const userName = !course.User
     ? ""
     : `${course.User.firstName} ${course.User.lastName}`;
+
+  const axiosDelete = (url, options) => {
+    return axios.delete(url, options).catch((err) => {
+      return err.response;
+    });
+  };
+
+  const handleDeleteCourse = (e) => {
+    e.preventDefault();
+    const url = apiUrl + `/courses/${id}`;
+
+    const options = {
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      auth: {
+        username: authUser.emailAddress,
+        password: atob(authUser.cred),
+      },
+    };
+
+    try {
+      const response = axiosDelete(url, options).then((res) => {
+        return res;
+      });
+
+      if (response) {
+        setTimeout(() => {
+          history.push(`/`);
+        }, 150);
+      } else {
+        history.push("/error");
+      }
+    } catch (error) {
+      if (error.status === 404) {
+        history.push("/notfound");
+      } else {
+        history.push("/error");
+      }
+    }
+  };
 
   return (
     <div>
@@ -35,9 +80,9 @@ const CourseDetail = ({ match }) => {
                 <NavLink className="button" to={`/courses/${id}/update`}>
                   Update Course
                 </NavLink>
-                <a className="button" href="/">
+                <button className="button" onClick={handleDeleteCourse}>
                   Delete Course
-                </a>
+                </button>
               </span>
             ) : (
               ""

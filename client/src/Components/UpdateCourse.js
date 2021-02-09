@@ -14,7 +14,7 @@ const UpdateCourse = (props) => {
 
   const { authUser } = useContext(authContext);
   const history = useHistory();
-  const courseData = useFetch({ path: `/courses/${id}`, extra: "hi" });
+  const courseData = useFetch({ path: `/courses/${id}` });
   const { response } = courseData;
   const course = response ? response.data : {};
 
@@ -38,13 +38,11 @@ const UpdateCourse = (props) => {
     return axios
       .put(url, payload, options)
       .catch((err) => {
-        console.log("put err: ", err);
         return err.response;
       });
   };
 
   const submit = () => {
-    console.log("begin submit");
     const url = apiUrl + `/courses/${id}`;
 
     const payload = {
@@ -66,23 +64,22 @@ const UpdateCourse = (props) => {
     };
 
     try {
-      console.log("begin try");
       const response = axiosPut(url, payload, options)
         .then((res) => {
-          console.log('res: ', res);
           return res;
         });
 
-      if (response && response.data.errors) {
+      if (response) {
+        setTimeout(() => {
+          history.push(`/courses/${id}`);
+        }, 500);
+      } else {
         setErrors(response.data.errors);
-      }
-      else {
-        history.push(`/courses/${id}`);
       }
     } catch (error) {
       console.error(error);
 
-      if (error.response.status === 404) {
+      if (error.status === 404) {
         history.push("/notfound");
       } else {
         history.push("/error");
